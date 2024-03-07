@@ -43,14 +43,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("CambiarContrasenna")]
-        public IActionResult CambiarContrasenna()
-        {
-            return Ok();
-
-        }
+ 
 
 
         [AllowAnonymous]
