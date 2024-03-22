@@ -8,14 +8,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
-string SecretKey = config["Settings:SecretKey"].ToString();
+string SecretKey = config["settings:SecretKey"].ToString();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<IUtilitariosModel, UtilitariosModel>();
 
-builder.Services.AddSwaggerGen(options =>
+
+builder.Services.AddSwaggerGen(options => 
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
@@ -35,7 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("LZEtxqumEujmymhPWFMTxcjDKzTmunxp")),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
             ValidateLifetime = true,
             LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) =>
             {
