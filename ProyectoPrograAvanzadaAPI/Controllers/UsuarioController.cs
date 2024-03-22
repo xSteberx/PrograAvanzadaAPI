@@ -1,19 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using ProyectoPrograAvanzadaAPI.Entities;
+using ProyectoPrograAvanzadaAPI.Services;
+using Dapper;
 using System.Data.SqlClient;
 using System.Data;
-using ProyectoPrograAvanzadaAPI.Entities;
-using Dapper;
-using ProyectoPrograAvanzadaAPI.Models;
-using ProyectoPrograAvanzadaAPI.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace ProyectoPrograAvanzadaAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsuarioController(IConfiguration _configuration,IUtilitariosModel _utilitariosModel, IHostEnvironment _hostEnvironment) : ControllerBase
+    public class UsuarioController(IConfiguration _configuration, IUtilitariosModel _utilitariosModel,
+                                   IHostEnvironment _hostEnvironment) : ControllerBase
     {
 
         [AllowAnonymous]
@@ -42,7 +41,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
                 return Ok(respuesta);
             }
-
         }
 
         [AllowAnonymous]
