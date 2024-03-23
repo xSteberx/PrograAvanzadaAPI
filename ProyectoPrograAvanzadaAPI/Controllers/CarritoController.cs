@@ -40,5 +40,30 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
+        
+        [HttpPost]
+        [Route("AgregarCarrito")]
+        public IActionResult AgregarCarrito(Carrito entidad)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                CarritoRespuesta respuesta = new CarritoRespuesta();
+
+                var resultado = db.Execute("AgregarCarrito",
+                    new { entidad.IdUsuario, entidad.IdProducto, entidad.Cantidad, entidad.Fecha },
+                    commandType: CommandType.StoredProcedure);
+
+                if (resultado <= 0)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "Error al agregar el producto al carrito";
+                }
+
+                return Ok(respuesta);
+
+            }
+        }
+
+
     }
 }
