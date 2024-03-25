@@ -24,7 +24,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             {
                 CategoriaRespuesta respuesta = new CategoriaRespuesta();
 
-                var resultado = db.Query<Categoria>("ConsultarCategoria",
+                var resultado = db.Query<Categoria>("ConsultarCategorias",
                     new { MostrarTodos },
                     commandType: CommandType.StoredProcedure).ToList();
 
@@ -41,7 +41,32 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 return Ok(respuesta);
             }
         }
+		[Authorize]
+		[HttpGet]
+		[Route("ConsultarProductosCat")]
+		public IActionResult ConsultarProductosCat(int idcategoria)
+		{
+			using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+			{
+				ProductoRespuesta respuesta = new ProductoRespuesta();
 
+				var resultado = db.Query<Producto>("ConsultarProductosCat",
+					new { idcategoria },
+					commandType: CommandType.StoredProcedure).ToList();
 
-    }
+				if (resultado == null)
+				{
+					respuesta.Codigo = "-1";
+					respuesta.Mensaje = "No hay productos registrados en esta categoria";
+				}
+				else
+				{
+					respuesta.Datos = resultado;
+				}
+
+				return Ok(respuesta);
+			}
+		}
+
+	}
 }
