@@ -13,10 +13,11 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
     [ApiController]
     public class CarritoController(IConfiguration _configuration) : ControllerBase
     {
+
        
         [HttpGet]
         [Route("ConsultarCarrito")]
-        public IActionResult ConsultarCarrito(int IdUsuario)
+        public IActionResult ConsultarCarrito(long IdUsuario)
         {
             using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
@@ -26,7 +27,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     new { IdUsuario },
                     commandType: CommandType.StoredProcedure).ToList();
 
-                if (resultado.Count == 0)
+                if (resultado == null)
                 {
                     respuesta.Codigo = "-1";
                     respuesta.Mensaje = "No hay productos en el carrito";
@@ -40,26 +41,31 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
+
         [HttpPost]
-        [Route("AgregarCarrito")]
-        public IActionResult AgregarCarrito(Carrito entidad)
-        {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                CarritoRespuesta respuesta = new CarritoRespuesta();
+		[Route("AgregarCarrito")]
+		public IActionResult AgregarCarrito(Carrito entidad)
+		{
+			using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+			{
+				CarritoRespuesta respuesta = new CarritoRespuesta();
 
-                var resultado = db.Execute("AgregarCarrito",
-                    new { entidad.IdProducto, entidad.IdUsuario, entidad.Cantidad,entidad.Fecha },
-                    commandType: CommandType.StoredProcedure);
-                if (resultado <= 0)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Error al registrar el producto";
-                }
+				var resultado = db.Execute("AgregarCarrito",
+					new { entidad.IdUsuario, entidad.IdProducto, entidad.Cantidad,entidad.Fecha },
+					commandType: CommandType.StoredProcedure);
 
-                return Ok(respuesta);
-            }
-        }
+				if (resultado <= 0)
+				{
+					respuesta.Codigo = "-1";
+					respuesta.Mensaje = "Error al agrgar al carrito";
+				}
 
-    }
+				return Ok(respuesta);
+
+			}
+		}
+
+
+
+	}
 }
