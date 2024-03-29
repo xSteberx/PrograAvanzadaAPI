@@ -9,7 +9,9 @@
         public string? Codigo { get; set; }
         public string? NombreProducto { get; set; }
         public int? Precio { get; set; }
-        
+
+      
+
     }
     public class CarritoRespuesta
     {
