@@ -4,6 +4,7 @@
     {
         public long IdProducto { get; set; }
         public string? Nombre { get; set; }
+        public string? NombreCategoria { get; set; }
         public decimal Precio { get; set; }
         public string? NombreCategoria { get; set; }
         public string? Imagen { get; set; }
