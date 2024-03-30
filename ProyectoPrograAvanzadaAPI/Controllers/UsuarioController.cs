@@ -20,26 +20,32 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("IniciarSesion")]
         public IActionResult IniciarSesion(Usuario entidad)
         {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            try
             {
-                UsuarioRespuesta respuesta = new UsuarioRespuesta();
+				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+				{
+					UsuarioRespuesta respuesta = new UsuarioRespuesta();
 
-                var resultado = db.Query<Usuario>("IniciarSesion",
-                    new { entidad.Correo, entidad.Contrasenna },
-                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+					var resultado = db.Query<Usuario>("IniciarSesion",
+						new { entidad.Correo, entidad.Contrasenna },
+						commandType: CommandType.StoredProcedure).FirstOrDefault();
 
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Sus datos no son correctos";
-                }
-                else
-                {
-                    respuesta.Dato = resultado;
-                    respuesta.Dato.Token = _utilitariosModel.GenerarToken(resultado.Correo ?? string.Empty);
-                }
+					if (resultado == null)
+					{
+						respuesta.Codigo = "-1";
+						respuesta.Mensaje = "Sus datos no son correctos";
+					}
+					else
+					{
+						respuesta.Dato = resultado;
+						respuesta.Dato.Token = _utilitariosModel.GenerarToken(resultado.Correo ?? string.Empty);
+					}
 
-                return Ok(respuesta);
+					return Ok(respuesta);
+				}
+			}catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -48,35 +54,41 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("RecuperarAcceso")]
         public IActionResult RecuperarAcceso(Usuario entidad)
         {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            try
             {
-                UsuarioRespuesta respuesta = new UsuarioRespuesta();
+				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+				{
+					UsuarioRespuesta respuesta = new UsuarioRespuesta();
 
-                string NuevaContrasenna = _utilitariosModel.GenerarNuevaContrasenna();
-                string Contrasenna = _utilitariosModel.Encrypt(NuevaContrasenna);
-                bool EsTemporal = true;
+					string NuevaContrasenna = _utilitariosModel.GenerarNuevaContrasenna();
+					string Contrasenna = _utilitariosModel.Encrypt(NuevaContrasenna);
+					bool EsTemporal = true;
 
-                var resultado = db.Query<Usuario>("RecuperarAcceso",
-                    new { entidad.Correo, Contrasenna, EsTemporal },
-                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+					var resultado = db.Query<Usuario>("RecuperarAcceso",
+						new { entidad.Correo, Contrasenna, EsTemporal },
+						commandType: CommandType.StoredProcedure).FirstOrDefault();
 
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Sus datos no son correctos";
-                }
-                else
-                {
-                    string ruta = Path.Combine(_hostEnvironment.ContentRootPath, "Password.html");
-                    string htmlBody = System.IO.File.ReadAllText(ruta);
-                    htmlBody = htmlBody.Replace("@Usuario@", resultado.NombreUsuario);
-                    htmlBody = htmlBody.Replace("@Contrasenna@", NuevaContrasenna);
+					if (resultado == null)
+					{
+						respuesta.Codigo = "-1";
+						respuesta.Mensaje = "Sus datos no son correctos";
+					}
+					else
+					{
+						string ruta = Path.Combine(_hostEnvironment.ContentRootPath, "Password.html");
+						string htmlBody = System.IO.File.ReadAllText(ruta);
+						htmlBody = htmlBody.Replace("@Usuario@", resultado.NombreUsuario);
+						htmlBody = htmlBody.Replace("@Contrasenna@", NuevaContrasenna);
 
-                    _utilitariosModel.EnviarCorreo(resultado.Correo!, "Nueva Contraseña!!", htmlBody);
-                    respuesta.Dato = resultado;
-                }
+						_utilitariosModel.EnviarCorreo(resultado.Correo!, "Nueva Contraseña!!", htmlBody);
+						respuesta.Dato = resultado;
+					}
 
-                return Ok(respuesta);
+					return Ok(respuesta);
+				}
+			}catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -85,27 +97,32 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("CambiarContrasenna")]
         public IActionResult CambiarContrasenna(Usuario entidad)
         {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            try
             {
-                UsuarioRespuesta respuesta = new UsuarioRespuesta();
-                bool EsTemporal = false;
+				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+				{
+					UsuarioRespuesta respuesta = new UsuarioRespuesta();
+					bool EsTemporal = false;
 
-                var resultado = db.Query<Usuario>("CambiarContrasenna",
-                    new { entidad.Correo, entidad.Contrasenna, entidad.ContrasennaTemporal, EsTemporal },
-                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+					var resultado = db.Query<Usuario>("CambiarContrasenna",
+						new { entidad.Correo, entidad.Contrasenna, entidad.ContrasennaTemporal, EsTemporal },
+						commandType: CommandType.StoredProcedure).FirstOrDefault();
 
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Sus datos no son correctos";
-                }
-                else
-                {
-                    respuesta.Dato = resultado;
-                }
+					if (resultado == null)
+					{
+						respuesta.Codigo = "-1";
+						respuesta.Mensaje = "Sus datos no son correctos";
+					}
+					else
+					{
+						respuesta.Dato = resultado;
+					}
 
-                return Ok(respuesta);
-            }
+					return Ok(respuesta);
+				}
+			}catch (Exception ex) { 
+				return BadRequest(ex.Message);
+			}
         }
 
         [AllowAnonymous]
@@ -113,23 +130,28 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("RegistrarUsuario")]
         public IActionResult RegistrarUsuario(Usuario entidad)
         {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                Respuesta respuesta = new Respuesta();
+			try
+			{
+				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+				{
+					Respuesta respuesta = new Respuesta();
 
-                var resultado = db.Execute("RegistrarUsuario",
-                    new { entidad.Correo, entidad.Contrasenna, entidad.NombreUsuario },
-                    commandType: CommandType.StoredProcedure);
+					var resultado = db.Execute("RegistrarUsuario",
+						new { entidad.Correo, entidad.Contrasenna, entidad.NombreUsuario },
+						commandType: CommandType.StoredProcedure);
 
-                if (resultado <= 0)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Su correo ya se encuentra registrado";
-                }
+					if (resultado <= 0)
+					{
+						respuesta.Codigo = "-1";
+						respuesta.Mensaje = "Su correo ya se encuentra registrado";
+					}
 
-                return Ok(respuesta);
+					return Ok(respuesta);
 
-            }
+				}
+			}catch(Exception ex) { 
+				return BadRequest(ex.Message); 
+			}
         }
 
 
