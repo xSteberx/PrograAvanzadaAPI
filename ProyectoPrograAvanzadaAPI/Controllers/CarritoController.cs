@@ -19,26 +19,33 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("ConsultarCarrito")]
         public IActionResult ConsultarCarrito(long IdUsuario)
         {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                CarritoRespuesta respuesta = new CarritoRespuesta();
+            try {
 
-                var resultado = db.Query<Carrito>("ConsultarCarrito",
-                    new { IdUsuario },
-                    commandType: CommandType.StoredProcedure).ToList();
+				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+				{
+					CarritoRespuesta respuesta = new CarritoRespuesta();
 
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No hay productos en el carrito";
-                }
-                else
-                {
-                    respuesta.Datos = resultado;
-                }
+					var resultado = db.Query<Carrito>("ConsultarCarrito",
+						new { IdUsuario },
+						commandType: CommandType.StoredProcedure).ToList();
 
-                return Ok(respuesta);
-            }
+					if (resultado == null)
+					{
+						respuesta.Codigo = "-1";
+						respuesta.Mensaje = "No hay productos en el carrito";
+					}
+					else
+					{
+						respuesta.Datos = resultado;
+					}
+
+					return Ok(respuesta);
+				}
+			}catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+
         }
 
 
@@ -46,22 +53,27 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 		[Route("AgregarCarrito")]
 		public IActionResult AgregarCarrito(Carrito entidad)
 		{
-			using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+			try
 			{
-				CarritoRespuesta respuesta = new CarritoRespuesta();
-
-				var resultado = db.Execute("AgregarCarrito",
-					new { entidad.IdUsuario, entidad.IdProducto, entidad.Cantidad,entidad.Fecha },
-					commandType: CommandType.StoredProcedure);
-
-				if (resultado <= 0)
+				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
-					respuesta.Codigo = "-1";
-					respuesta.Mensaje = "Error al agrgar al carrito";
+					CarritoRespuesta respuesta = new CarritoRespuesta();
+
+					var resultado = db.Execute("AgregarCarrito",
+						new { entidad.IdUsuario, entidad.IdProducto, entidad.Cantidad, entidad.Fecha },
+						commandType: CommandType.StoredProcedure);
+
+					if (resultado <= 0)
+					{
+						respuesta.Codigo = "-1";
+						respuesta.Mensaje = "Error al agrgar al carrito";
+					}
+
+					return Ok(respuesta);
+
 				}
-
-				return Ok(respuesta);
-
+			}catch(Exception ex) {
+				return BadRequest(ex.Message);
 			}
 		}
 
