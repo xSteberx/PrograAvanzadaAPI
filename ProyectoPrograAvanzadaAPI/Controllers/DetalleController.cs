@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using ProyectoPrograAvanzadaAPI.Entities;
 using System.Data.SqlClient;
 using System.Data;
@@ -10,25 +11,26 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ServicioController(IConfiguration _configuration) : ControllerBase
+    public class DetalleController(IConfiguration _configuration) : ControllerBase
     {
+
         [Authorize]
         [HttpGet]
-        [Route("ConsultarServicios")]
-        public IActionResult ConsultarServicios(bool MostrarTodos)
+        [Route("ConsultarDetalles")]
+        public IActionResult ConsultarDetalles(bool MostrarTodos)
         {
             using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                ServicioRespuesta respuesta = new ServicioRespuesta();
+                DetalleRespuesta respuesta = new DetalleRespuesta();
 
-                var resultado = db.Query<Servicio>("ConsultarServicios",
+                var resultado = db.Query<Detalle>("ConsultarDetalles",
                     new { MostrarTodos },
                     commandType: CommandType.StoredProcedure).ToList();
 
                 if (resultado == null)
                 {
                     respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No hay servicios registrados";
+                    respuesta.Mensaje = "No hay Detalle registrados";
                 }
                 else
                 {
@@ -39,29 +41,40 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
+
+
         [Authorize]
         [HttpPost]
-        [Route("RegistrarServicio")]
-        public IActionResult RegistrarServicio(Servicio entidad)
+        [Route("RegistrarDetalle")]
+        public IActionResult RegistrarDetalle(Detalle entidad)
         {
             using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 Respuesta respuesta = new Respuesta();
 
-                var resultado = db.Execute("RegistrarServicio",
-                    new { entidad.Nombre, entidad.Precio, entidad.Imagen, entidad.Video },
-                    commandType: CommandType.StoredProcedure);
+                var resultado = db.Query<Detalle>("RegistrarDetalle",
+                    new { entidad.Cantidad, entidad.IdCarrito },
+                    commandType: CommandType.StoredProcedure).FirstOrDefault();
 
-                if (resultado <= 0)
+                if (resultado == null)
                 {
                     respuesta.Codigo = "-1";
                     respuesta.Mensaje = "Este servicio ya se encuentra registrado";
+                }
+                else
+                {
+                    respuesta.ConsecutivoGenerado = resultado.IdDetalle;
                 }
 
                 return Ok(respuesta);
 
             }
         }
+
+
+
+
+
 
     }
 }
