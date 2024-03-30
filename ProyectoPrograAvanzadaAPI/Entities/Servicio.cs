@@ -26,6 +26,9 @@
         public string? Mensaje { get; set; }
         public Servicio? Dato { get; set; }
         public List<Servicio>? Datos { get; set; }
+
+
+
     }
 
 }
