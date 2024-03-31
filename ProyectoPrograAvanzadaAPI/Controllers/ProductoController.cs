@@ -14,40 +14,117 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
     public class ProductoController(IConfiguration _configuration) : ControllerBase
     {
 
-        [Authorize]
+    
         [HttpGet]
-        [Route("ConsultarProducto")]
-        public IActionResult ConsultarProducto(bool MostrarTodos)
+        [Route("ConsultarProductos")]
+        public IActionResult ConsultarProductos(bool MostrarTodos)
         {
-            try
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-				{
-					ProductoRespuesta respuesta = new ProductoRespuesta();
+                ProductoRespuesta respuesta = new ProductoRespuesta();
 
-					var resultado = db.Query<Producto>("ConsultarProducto",
-						new { MostrarTodos },
-						commandType: CommandType.StoredProcedure).ToList();
+                var resultado = db.Query<Producto>("ConsultarProductos",
+                    new { MostrarTodos },
+                    commandType: CommandType.StoredProcedure).ToList();
 
-					if (resultado == null)
-					{
-						respuesta.Codigo = "-1";
-						respuesta.Mensaje = "No hay productos registrados";
-					}
-					else
-					{
-						respuesta.Datos = resultado;
-					}
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay productos registrados";
+                }
+                else
+                {
+                    respuesta.Datos = resultado;
+                }
 
-					return Ok(respuesta);
-				}
-			}catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
+                return Ok(respuesta);
+            }
         }
 
 
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("ConsultarProducto")]
+        public IActionResult ConsultarProducto(long IdProducto)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                ProductoRespuesta respuesta = new ProductoRespuesta();
+
+                var resultado = db.Query<Producto>("ConsultarProducto",
+                    new { IdProducto },
+                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay Producto registrados";
+                }
+                else
+                {
+                    respuesta.Dato = resultado;
+                }
+
+                return Ok(respuesta);
+            }
+        }
+
+
+
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("RegistrarProducto")]
+        public IActionResult RegistrarProducto(Producto entidad)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                Respuesta respuesta = new Respuesta();
+
+                var resultado = db.Query<Producto>("RegistrarProducto",
+                    new { entidad.Nombre, entidad.Precio, entidad.IdCategoria, entidad.Imagen },
+                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "Este Producto ya se encuentra registrado";
+                }
+                else
+                {
+                    respuesta.ConsecutivoGenerado = resultado.IdProducto;
+                }
+
+                return Ok(respuesta);
+
+            }
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("ActualizarProducto")]
+        public IActionResult ActualizarProducto(Producto entidad)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                Respuesta respuesta = new Respuesta();
+
+                var resultado = db.Execute("ActualizarProducto",
+                    new { entidad.IdProducto,entidad.Nombre, entidad.Precio, entidad.IdCategoria, entidad.Estado },
+                    commandType: CommandType.StoredProcedure);
+
+                if (resultado <= 0)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No se pudo actualizar este servicio";
+                }
+
+                return Ok(respuesta);
+            }
+        }
 
 
     }
