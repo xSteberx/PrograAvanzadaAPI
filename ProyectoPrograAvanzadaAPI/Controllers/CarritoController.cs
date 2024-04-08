@@ -77,7 +77,37 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 			}
 		}
 
+        [HttpPost]
+        [Route("RemueveProducto")]
+        public IActionResult RemueveProducto( long IdProducto)
+        {
+            try
+            {
+                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    CarritoRespuesta respuesta = new CarritoRespuesta();
+
+                    var resultado = db.Execute("RemueveProdCarrito",
+                        new { IdProducto },
+                        commandType: CommandType.StoredProcedure);
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "Error al remover del carrito";
+                    }
+
+                    return Ok(respuesta);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
-	}
+
+    }
 }
