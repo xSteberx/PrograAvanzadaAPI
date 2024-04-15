@@ -6,6 +6,7 @@ using ProyectoPrograAvanzadaAPI.Entities;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
+using ProyectoPrograAvanzadaAPI.Interfaces;
 
 namespace ProyectoPrograAvanzadaAPI.Controllers
 {
@@ -74,11 +75,10 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 
 
-
-        [Authorize]
+       
         [HttpPost]
         [Route("RegistrarProducto")]
-        public IActionResult RegistrarProducto(Producto entidad)
+        public async Task<IActionResult> RegistrarProducto(Producto entidad)
         {
             using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
@@ -99,9 +99,9 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 }
 
                 return Ok(respuesta);
-
             }
         }
+
 
         [Authorize]
         [HttpPut]
@@ -112,17 +112,30 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             {
                 Respuesta respuesta = new Respuesta();
 
-                var resultado = db.Execute("ActualizarProducto",
-                    new { entidad.IdProducto,entidad.Nombre, entidad.Precio, entidad.IdCategoria, entidad.Estado },
+                try
+                {
+                    var resultado = db.Execute("ActualizarProducto",
+                    new { entidad.IdProducto,entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre },
                     commandType: CommandType.StoredProcedure);
 
-                if (resultado <= 0)
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "No se pudo actualizar este servicio";
+                        return Ok(respuesta);
+                    }
+
+                    respuesta.Codigo = "00";
+                    respuesta.Mensaje = "Producto actualizado correctamente";
+                    return Ok(respuesta);
+                }
+                catch (Exception ex)
                 {
                     respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No se pudo actualizar este servicio";
+                    respuesta.Mensaje = "Error al actualizar el producto: " + ex.Message;
+                    return StatusCode(500, respuesta);
                 }
-
-                return Ok(respuesta);
             }
         }
 
