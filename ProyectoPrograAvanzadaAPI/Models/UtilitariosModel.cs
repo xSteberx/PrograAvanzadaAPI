@@ -2,7 +2,7 @@
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using ProyectoPrograAvanzadaAPI.Services;
+using ProyectoPrograAvanzadaAPI.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -94,7 +94,6 @@ namespace ProyectoPrograAvanzadaAPI.Models
 
             return Convert.ToBase64String(array);
         }
-
 
         public string Decrypt(string texto)
         {
