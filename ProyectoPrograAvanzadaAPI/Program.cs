@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProyectoPrograAvanzadaAPI.Models;
-using ProyectoPrograAvanzadaAPI.Services;
+using ProyectoPrograAvanzadaAPI.Interfaces;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 

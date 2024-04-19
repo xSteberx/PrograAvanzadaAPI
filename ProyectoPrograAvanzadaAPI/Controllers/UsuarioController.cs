@@ -1,5 +1,5 @@
 ﻿using ProyectoPrograAvanzadaAPI.Entities;
-using ProyectoPrograAvanzadaAPI.Services;
+using ProyectoPrograAvanzadaAPI.Interfaces;
 using Dapper;
 using System.Data.SqlClient;
 using System.Data;
@@ -124,6 +124,41 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 				return BadRequest(ex.Message);
 			}
         }
+
+        [Authorize]
+        [HttpPut]
+        [Route("CambiarContraUser")]
+        public IActionResult CambiarContraUser(Usuario entidad)
+        {
+            try
+            {
+                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    UsuarioRespuesta respuesta = new UsuarioRespuesta();
+
+					var resultado = db.Query<Usuario>("CambiarContraUser",
+						new { entidad.IdUsuario, entidad.Contrasenna },
+						commandType: CommandType.StoredProcedure);
+
+                    if (resultado == null)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "Contraseña no Actualizada";
+                    }
+                   
+
+                    return Ok(respuesta);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
 
         [AllowAnonymous]
         [HttpPost]
