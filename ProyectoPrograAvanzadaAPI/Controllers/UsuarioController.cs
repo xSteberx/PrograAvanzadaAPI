@@ -92,6 +92,53 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost]
+        [Route("tRegistrarUsuario")]
+        public IActionResult tRegistrarUsuario(Usuario entidad)
+        {
+            try
+            {
+                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    Respuesta respuesta = new Respuesta();
+
+                    string NuevaContrasenna = _utilitariosModel.GenerarNuevaContrasenna();
+                    string Contrasenna = _utilitariosModel.Encrypt(NuevaContrasenna);
+                    entidad.Contrasenna = Contrasenna;
+                    bool EsTemporal = true;
+
+                    var resultado = db.Execute("tRegistrarUsuario",
+                        new { entidad.Correo, entidad.Contrasenna, entidad.NombreUsuario,entidad.IdRol, EsTemporal },
+                        commandType: CommandType.StoredProcedure);
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "Su correo ya se encuentra registrado";
+                    }
+                    else
+                    {
+                        string ruta = Path.Combine(_hostEnvironment.ContentRootPath, "Password2.html");
+                        string htmlBody = System.IO.File.ReadAllText(ruta);
+                        htmlBody = htmlBody.Replace("@Usuario@", entidad.NombreUsuario);
+                        htmlBody = htmlBody.Replace("@Contrasenna@", NuevaContrasenna);
+
+                        _utilitariosModel.EnviarCorreo(entidad.Correo!, "Nueva Contraseña!!", htmlBody);
+                        respuesta.ConsecutivoGenerado = resultado;
+                    }
+
+                    return Ok(respuesta);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [AllowAnonymous]
         [HttpPut]
         [Route("CambiarContrasenna")]
@@ -157,7 +204,59 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         }
 
 
+        [Authorize]
+        [HttpGet]
+        [Route("ConsultarUsuarios")]
+        public IActionResult ConsultarUsuarios()
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                UsuarioRespuesta respuesta = new UsuarioRespuesta();
 
+                var resultado = db.Query<Usuario>("ConsultarUsuarios",
+                    commandType: CommandType.StoredProcedure).ToList();
+
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay usuarios registrados";
+                }
+                else
+                {
+                    respuesta.Datos = resultado;
+                }
+
+                return Ok(respuesta);
+            }
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("ConsultarUsuario")]
+        public IActionResult ConsultarUsuario(long IdUsuario)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                UsuarioRespuesta respuesta = new UsuarioRespuesta();
+
+                var resultado = db.Query<Usuario>("ConsultarUsuario",
+                    new { IdUsuario },
+                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay Producto registrados";
+                }
+                else
+                {
+                    respuesta.Dato = resultado;
+                }
+
+                return Ok(respuesta);
+            }
+        }
 
 
         [AllowAnonymous]
@@ -189,6 +288,71 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 			}
         }
 
+        [Authorize]
+        [HttpPut]
+        [Route("ActualizarUsuario")]
+        public IActionResult ActualizarUsuario(Usuario entidad)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                Respuesta respuesta = new Respuesta();
 
+                try
+                {
+                    var resultado = db.Execute("ActualizarUsuario",
+                    new { entidad.IdUsuario, entidad.NombreUsuario, entidad.IdRol, entidad.Correo, entidad.Estado },
+                    commandType: CommandType.StoredProcedure);
+
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "No se pudo actualizar este usuario";
+                        return Ok(respuesta);
+                    }
+
+                    respuesta.Codigo = "00";
+                    respuesta.Mensaje = "Usuario actualizado correctamente";
+                    return Ok(respuesta);
+                }
+                catch (Exception ex)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "Error al actualizar el usuario: " + ex.Message;
+                    return StatusCode(500, respuesta);
+                }
+            }
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("EliminarUsuario")]
+        public IActionResult EliminarUsuario(long  IdUsuario)
+        {
+            try
+            {
+                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    Respuesta respuesta = new Respuesta();
+
+                    var resultado = db.Execute("EliminarUsuario",
+                        new { IdUsuario },
+                        commandType: CommandType.StoredProcedure);
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "Usuario no existente";
+                    }
+
+                    return Ok(respuesta);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

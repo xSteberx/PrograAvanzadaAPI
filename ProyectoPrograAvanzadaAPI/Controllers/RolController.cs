@@ -1,37 +1,36 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using ProyectoPrograAvanzadaAPI.Entities;
+using ProyectoPrograAvanzadaAPI.Interfaces;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using ProyectoPrograAvanzadaAPI.Interfaces;
 
 namespace ProyectoPrograAvanzadaAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductoController(IConfiguration _configuration) : ControllerBase
+    public class RolController(IConfiguration _configuration, IUtilitariosModel _utilitariosModel,
+                                   IHostEnvironment _hostEnvironment) : ControllerBase
     {
 
-    
+        [Authorize]
         [HttpGet]
-        [Route("ConsultarProductos")]
-        public IActionResult ConsultarProductos(bool MostrarTodos)
+        [Route("ConsultarRoles")]
+        public IActionResult ConsultarRoles()
         {
             using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                ProductoRespuesta respuesta = new ProductoRespuesta();
+                RolRespuesta respuesta = new RolRespuesta();
 
-                var resultado = db.Query<Producto>("ConsultarProductos",
-                    new { MostrarTodos },
+                var resultado = db.Query<Rol>("ConsultarRoles",
                     commandType: CommandType.StoredProcedure).ToList();
 
                 if (resultado == null)
                 {
                     respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No hay productos registrados";
+                    respuesta.Mensaje = "No hay roles registrados";
                 }
                 else
                 {
@@ -41,21 +40,17 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 return Ok(respuesta);
             }
         }
-
-
-
-
         [Authorize]
         [HttpGet]
-        [Route("ConsultarProducto")]
-        public IActionResult ConsultarProducto(long IdProducto)
+        [Route("ConsultaRolesp")]
+        public IActionResult ConsultaRolesp(long IdRol)
         {
             using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                ProductoRespuesta respuesta = new ProductoRespuesta();
+                RolRespuesta respuesta = new RolRespuesta();
 
-                var resultado = db.Query<Producto>("ConsultarProducto",
-                    new { IdProducto },
+                var resultado = db.Query<Rol>("ConsultaRolesp",
+                    new { IdRol },
                     commandType: CommandType.StoredProcedure).FirstOrDefault();
 
                 if (resultado == null)
@@ -72,78 +67,9 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
-
-
-
-       
         [HttpPost]
-        [Route("RegistrarProducto")]
-        public async Task<IActionResult> RegistrarProducto(Producto entidad)
-        {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                Respuesta respuesta = new Respuesta();
-
-                var resultado = db.Query<Producto>("RegistrarProducto",
-                    new { entidad.Nombre, entidad.Precio, entidad.IdCategoria, entidad.Imagen },
-                    commandType: CommandType.StoredProcedure).FirstOrDefault();
-
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Este Producto ya se encuentra registrado";
-                }
-                else
-                {
-                    respuesta.ConsecutivoGenerado = resultado.IdProducto;
-                }
-
-                return Ok(respuesta);
-            }
-        }
-
-
-        [Authorize]
-        [HttpPut]
-        [Route("ActualizarProducto")]
-        public IActionResult ActualizarProducto(Producto entidad)
-        {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                Respuesta respuesta = new Respuesta();
-
-                try
-                {
-                    var resultado = db.Execute("ActualizarProducto",
-                    new { entidad.IdProducto,entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre },
-                    commandType: CommandType.StoredProcedure);
-
-
-                    if (resultado <= 0)
-                    {
-                        respuesta.Codigo = "-1";
-                        respuesta.Mensaje = "No se pudo actualizar este servicio";
-                        return Ok(respuesta);
-                    }
-
-                    respuesta.Codigo = "00";
-                    respuesta.Mensaje = "Producto actualizado correctamente";
-                    return Ok(respuesta);
-                }
-                catch (Exception ex)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Error al actualizar el producto: " + ex.Message;
-                    return StatusCode(500, respuesta);
-                }
-            }
-        }
-
-
-        [Authorize]
-        [HttpDelete]
-        [Route("EliminarProducto")]
-        public IActionResult EliminarProducto(long IdProducto)
+        [Route("RegistraRol")]
+        public IActionResult RegistraRol(Rol entidad)
         {
             try
             {
@@ -151,14 +77,13 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 {
                     Respuesta respuesta = new Respuesta();
 
-                    var resultado = db.Execute("EliminaProducto",
-                        new { IdProducto },
+                    var resultado = db.Execute("CreaRol",
+                        new { entidad.Nombre},
                         commandType: CommandType.StoredProcedure);
 
                     if (resultado <= 0)
                     {
                         respuesta.Codigo = "-1";
-                        respuesta.Mensaje = "Producto no existente";
                     }
 
                     return Ok(respuesta);
@@ -170,5 +95,73 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut]
+        [Route("tActualizaRol")]
+        public IActionResult tActualizaRol(Rol entidad)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                Respuesta respuesta = new Respuesta();
+
+                try
+                {
+                    var resultado = db.Execute("ActualizaRol",
+                    new { entidad.IdRol, entidad.Nombre },
+                    commandType: CommandType.StoredProcedure);
+
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "No se pudo actualizar este rol";
+                        return Ok(respuesta);
+                    }
+
+                    respuesta.Codigo = "00";
+                    respuesta.Mensaje = "Rol actualizado correctamente";
+                    return Ok(respuesta);
+                }
+                catch (Exception ex)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "Error al actualizar el rol: " + ex.Message;
+                    return StatusCode(500, respuesta);
+                }
+            }
+        }
+
+
+        [Authorize]
+        [HttpDelete]
+        [Route("EliminarRol")]
+        public IActionResult EliminarRol(long IdRol)
+        {
+            try
+            {
+                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    Respuesta respuesta = new Respuesta();
+
+                    var resultado = db.Execute("EliminaRol",
+                        new { IdRol },
+                        commandType: CommandType.StoredProcedure);
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "Rol no existente";
+                    }
+
+                    return Ok(respuesta);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
