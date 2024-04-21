@@ -9,10 +9,10 @@ using Dapper;
 
 namespace ProyectoPrograAvanzadaAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CategoriaController(IConfiguration _configuration) : ControllerBase
-    {
+	[Route("api/[controller]")]
+	[ApiController]
+	public class CategoriaController(IConfiguration _configuration) : ControllerBase
+	{
 		/*Este sirve para poder hacer la consulta a nivel general, esto con booleano.*/
 		[Authorize]
 		[HttpGet]
@@ -42,38 +42,38 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 		}
 
 
-        /*Este sirve para poder hacer la consulta a nivel especifico, precisamente el IdCategoria.*/
-        [Authorize]
-        [HttpGet]
-        [Route("ConsultarCategoria")]
-        public IActionResult ConsultarCategoria(long IdCategoria)
-        {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                CategoriaRespuesta respuesta = new CategoriaRespuesta();
+		/*Este sirve para poder hacer la consulta a nivel especifico, precisamente el IdCategoria.*/
+		[Authorize]
+		[HttpGet]
+		[Route("ConsultarCategoria")]
+		public IActionResult ConsultarCategoria(long IdCategoria)
+		{
+			using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+			{
+				CategoriaRespuesta respuesta = new CategoriaRespuesta();
 
-                var resultado = db.Query<Categoria>("ConsultarCategoria",
-                    new { IdCategoria },
-                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+				var resultado = db.Query<Categoria>("ConsultarCategoria",
+					new { IdCategoria },
+					commandType: CommandType.StoredProcedure).FirstOrDefault();
 
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No hay categoria registrada";
-                }
-                else
-                {
-                    respuesta.Dato = resultado;
-                }
+				if (resultado == null)
+				{
+					respuesta.Codigo = "-1";
+					respuesta.Mensaje = "No hay categoria registrada";
+				}
+				else
+				{
+					respuesta.Dato = resultado;
+				}
 
-                return Ok(respuesta);
-            }
-        }
+				return Ok(respuesta);
+			}
+		}
 
 
 
-        /*Este sirve para poder registrar las categorias*/
-        [Authorize]
+		/*Este sirve para poder registrar las categorias*/
+		[Authorize]
 		[HttpPost]
 		[Route("RegistrarCategoria")]
 		public IActionResult RegistrarCategoria(Categoria entidad)
@@ -97,9 +97,9 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 		}
 
 
-        /*Este sirve para poder actualizar las categorias*/
-        [Authorize]
-        [HttpPut]
+		/*Este sirve para poder actualizar las categorias*/
+		[Authorize]
+		[HttpPut]
 		[Route("ActualizarCategoria")]
 		public IActionResult ActualizarCategoria(Categoria entidad)
 		{
@@ -156,5 +156,36 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 			}
 		}
 
-	}
+        [Authorize]
+        [HttpDelete]
+        [Route("EliminarCategoria")]
+        public IActionResult EliminarCategoria(long IdCategoria)
+        {
+            try
+            {
+                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    Respuesta respuesta = new Respuesta();
+
+                    var resultado = db.Execute("EliminaCategoria",
+                        new { IdCategoria },
+                        commandType: CommandType.StoredProcedure);
+
+                    if (resultado <= 0)
+                    {
+                        respuesta.Codigo = "-1";
+                        respuesta.Mensaje = "Categoria no existente";
+                    }
+
+                    return Ok(respuesta);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+    }
 }
