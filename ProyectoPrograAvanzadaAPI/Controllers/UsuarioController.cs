@@ -233,6 +233,34 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("ConsultaUsuarioesp")]
+        public IActionResult ConsultaUsuarioesp(long IdUsuario)
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                UsuarioRespuesta respuesta = new UsuarioRespuesta();
+
+                var resultado = db.Query<Usuario>("ConsultaUsuarioesp",
+                    new { IdUsuario },
+                    commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay usuarios registrados";
+                }
+                else
+                {
+                    respuesta.Dato = resultado;
+                }
+
+                return Ok(respuesta);
+            }
+        }
+
+
+        [Authorize]
+        [HttpGet]
         [Route("ConsultarUsuario")]
         public IActionResult ConsultarUsuario(long IdUsuario)
         {

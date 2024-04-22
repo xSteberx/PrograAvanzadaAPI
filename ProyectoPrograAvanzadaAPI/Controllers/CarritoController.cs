@@ -77,7 +77,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 			}
 		}
 
-        [HttpPost]
+        [HttpDelete]
         [Route("RemueveProducto")]
         public IActionResult RemueveProducto( long IdProducto)
         {

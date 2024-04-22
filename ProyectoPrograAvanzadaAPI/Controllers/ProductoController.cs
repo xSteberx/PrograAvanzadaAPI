@@ -115,7 +115,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 try
                 {
                     var resultado = db.Execute("ActualizarProducto",
-                    new { entidad.IdProducto,entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre },
+                    new { entidad.IdProducto,entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre,entidad.Imagen },
                     commandType: CommandType.StoredProcedure);
 
 
