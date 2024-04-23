@@ -6,12 +6,13 @@ using ProyectoPrograAvanzadaAPI.Entities;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
+using ProyectoPrograAvanzadaAPI.Interfaces;
 
 namespace ProyectoPrograAvanzadaAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CarritoController(IConfiguration _configuration) : ControllerBase
+    public class CarritoController(IConfiguration _configuration,IUtilitariosModel _utilitariosModel) : ControllerBase
     {
 
        
@@ -108,6 +109,29 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         }
 
 
+        [Authorize]
+        [HttpPost]
+        [Route("PagarCarrito")]
+        public IActionResult PagarCarrito()
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                Respuesta respuesta = new Respuesta();
+                var name = User.Identity.Name;
+                long IdUsuario = long.Parse(_utilitariosModel.Decrypt(User.Identity.Name));
 
+                var resultado = db.Execute("PagarCarrito",
+                    new { IdUsuario },
+                    commandType: CommandType.StoredProcedure);
+
+                if (resultado <= 0)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No se pudo realizar su pago";
+                }
+
+                return Ok(respuesta);
+            }
+        }
     }
 }

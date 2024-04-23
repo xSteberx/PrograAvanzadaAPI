@@ -15,11 +15,12 @@ namespace ProyectoPrograAvanzadaAPI.Models
     {
         string SecretKey = _configuration.GetSection("Settings:SecretKey").Value ?? string.Empty;
 
-        public string GenerarToken(string correo)
+        public string GenerarToken(string correo,long IdUsuario)
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim("username", Encrypt(correo)));
-
+            claims.Add(new Claim(ClaimTypes.Name, Encrypt(IdUsuario.ToString())));
+            claims.Add(new Claim("usernamePersona", Encrypt(IdUsuario.ToString())));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);

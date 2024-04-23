@@ -38,7 +38,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 					else
 					{
 						respuesta.Dato = resultado;
-						respuesta.Dato.Token = _utilitariosModel.GenerarToken(resultado.Correo ?? string.Empty);
+						respuesta.Dato.Token = _utilitariosModel.GenerarToken(resultado.Correo ?? string.Empty,resultado.IdUsuario);
 					}
 
 					return Ok(respuesta);
