@@ -42,7 +42,30 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("ConsultarStockProductos")]
+        public IActionResult ConsultarStockProductos()
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                ProductoRespuesta respuesta = new ProductoRespuesta();
 
+                var resultado = db.Query<Producto>("ReporteStockProductos",
+                    commandType: CommandType.StoredProcedure).ToList();
+
+                if (resultado == null)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay productos registrados";
+                }
+                else
+                {
+                    respuesta.Datos = resultado;
+                }
+
+                return Ok(respuesta);
+            }
+        }
 
 
         [Authorize]

@@ -9,7 +9,7 @@
         public string? Imagen { get; set; }
         public short IdCategoria { get; set; }
         public bool Estado { get; set; }
-       
+        public long Stock { get; set; }
     }
 
 
