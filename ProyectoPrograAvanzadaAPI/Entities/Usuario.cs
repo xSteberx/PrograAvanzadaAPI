@@ -29,4 +29,17 @@
         public Usuario? Dato { get; set; }
         public List<Usuario>? Datos { get; set; }
     }
+    public class UsuarioReportes
+    {
+
+        public UsuarioReportes()
+        {
+            Codigo = "00";
+            Mensaje = string.Empty;
+        }
+
+        public string? Codigo { get; set; }
+        public string? Mensaje { get; set; }
+        public int? Cantidad { get; set; }
+    }
 }

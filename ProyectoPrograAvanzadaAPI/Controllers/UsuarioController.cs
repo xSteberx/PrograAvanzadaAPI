@@ -258,6 +258,32 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("CantidadUsuariosAct")]
+        public IActionResult CantidadUsuariosAct()
+        {
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                UsuarioReportes respuesta = new UsuarioReportes();
+
+                var cantidadUsuarios = db.Query<int>("CantidadUsuariosAct",
+                    commandType: CommandType.StoredProcedure).FirstOrDefault(); 
+
+                if (cantidadUsuarios == 0)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No hay usuarios activos";
+                }
+                else
+                {
+                    respuesta.Codigo = "00"; 
+                    respuesta.Cantidad = cantidadUsuarios; 
+                }
+
+                return Ok(respuesta);
+            }
+        }
+
 
         [Authorize]
         [HttpGet]
