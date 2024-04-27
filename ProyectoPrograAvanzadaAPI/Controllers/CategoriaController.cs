@@ -127,8 +127,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 		[Route("ConsultarProductosCat")]
 		public IActionResult ConsultarProductosCat(int idcategoria)
 		{
-			try
-			{
+
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
 					ProductoRespuesta respuesta = new ProductoRespuesta();
@@ -149,11 +148,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 					return Ok(respuesta);
 				}
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
 		}
 
         [Authorize]
@@ -161,8 +155,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("EliminarCategoria")]
         public IActionResult EliminarCategoria(long IdCategoria)
         {
-            try
-            {
+
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     Respuesta respuesta = new Respuesta();
@@ -180,11 +173,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+   
         }
 
     }

@@ -10,6 +10,7 @@
         public short IdCategoria { get; set; }
         public bool Estado { get; set; }
         public long Stock { get; set; }
+        public long ConteoCompras { get; set; }
     }
 
 
@@ -23,6 +24,7 @@
 
         public string? Codigo { get; set; }
         public string? Mensaje { get; set; }
+        public long? Cantidad { get; set; }
         public Producto? Dato { get; set; }
         public List<Producto>? Datos { get; set; }
     }

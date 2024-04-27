@@ -42,31 +42,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("ConsultarStockProductos")]
-        public IActionResult ConsultarStockProductos()
-        {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                ProductoRespuesta respuesta = new ProductoRespuesta();
-
-                var resultado = db.Query<Producto>("ReporteStockProductos",
-                    commandType: CommandType.StoredProcedure).ToList();
-
-                if (resultado == null)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No hay productos registrados";
-                }
-                else
-                {
-                    respuesta.Datos = resultado;
-                }
-
-                return Ok(respuesta);
-            }
-        }
-
+        
 
         [Authorize]
         [HttpGet]
@@ -135,8 +111,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             {
                 Respuesta respuesta = new Respuesta();
 
-                try
-                {
                     var resultado = db.Execute("ActualizarProducto",
                     new { entidad.IdProducto,entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre,entidad.Imagen },
                     commandType: CommandType.StoredProcedure);
@@ -152,13 +126,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     respuesta.Codigo = "00";
                     respuesta.Mensaje = "Producto actualizado correctamente";
                     return Ok(respuesta);
-                }
-                catch (Exception ex)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Error al actualizar el producto: " + ex.Message;
-                    return StatusCode(500, respuesta);
-                }
+              
             }
         }
 
@@ -168,8 +136,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("EliminarProducto")]
         public IActionResult EliminarProducto(long IdProducto)
         {
-            try
-            {
+
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     Respuesta respuesta = new Respuesta();
@@ -187,11 +154,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
         }
     }
 }

@@ -12,7 +12,7 @@ string SecretKey = config["settings:SecretKey"].ToString();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IUtilitariosModel, UtilitariosModel>();
 
 
@@ -51,6 +51,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 var app = builder.Build();
+
+app.UseExceptionHandler("/api/error/error");
 
 app.UseSwagger();
 

@@ -20,8 +20,9 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("IniciarSesion")]
         public IActionResult IniciarSesion(Usuario entidad)
         {
-            try
-            {
+
+           
+
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
 					UsuarioRespuesta respuesta = new UsuarioRespuesta();
@@ -43,10 +44,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 					return Ok(respuesta);
 				}
-			}catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+			
         }
 
         [AllowAnonymous]
@@ -54,8 +52,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("RecuperarAcceso")]
         public IActionResult RecuperarAcceso(Usuario entidad)
         {
-            try
-            {
+     
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
 					UsuarioRespuesta respuesta = new UsuarioRespuesta();
@@ -86,10 +83,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 					return Ok(respuesta);
 				}
-			}catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+		
         }
 
         [Authorize]
@@ -97,9 +91,9 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("tRegistrarUsuario")]
         public IActionResult tRegistrarUsuario(Usuario entidad)
         {
-            try
-            {
-                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+
+
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     Respuesta respuesta = new Respuesta();
 
@@ -131,11 +125,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+     
         }
 
 
@@ -144,8 +134,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("CambiarContrasenna")]
         public IActionResult CambiarContrasenna(Usuario entidad)
         {
-            try
-            {
+   
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
 					UsuarioRespuesta respuesta = new UsuarioRespuesta();
@@ -167,9 +156,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 					return Ok(respuesta);
 				}
-			}catch (Exception ex) { 
-				return BadRequest(ex.Message);
-			}
+		
         }
 
         [Authorize]
@@ -177,8 +164,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("CambiarContraUser")]
         public IActionResult CambiarContraUser(Usuario entidad)
         {
-            try
-            {
+  
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     UsuarioRespuesta respuesta = new UsuarioRespuesta();
@@ -196,11 +182,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
                     return Ok(respuesta);
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
         }
 
 
@@ -258,32 +240,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("CantidadUsuariosAct")]
-        public IActionResult CantidadUsuariosAct()
-        {
-            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                UsuarioReportes respuesta = new UsuarioReportes();
-
-                var cantidadUsuarios = db.Query<int>("CantidadUsuariosAct",
-                    commandType: CommandType.StoredProcedure).FirstOrDefault(); 
-
-                if (cantidadUsuarios == 0)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "No hay usuarios activos";
-                }
-                else
-                {
-                    respuesta.Codigo = "00"; 
-                    respuesta.Cantidad = cantidadUsuarios; 
-                }
-
-                return Ok(respuesta);
-            }
-        }
-
+     
 
         [Authorize]
         [HttpGet]
@@ -318,8 +275,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("RegistrarUsuario")]
         public IActionResult RegistrarUsuario(Usuario entidad)
         {
-			try
-			{
+
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
 					Respuesta respuesta = new Respuesta();
@@ -337,9 +293,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 					return Ok(respuesta);
 
 				}
-			}catch(Exception ex) { 
-				return BadRequest(ex.Message); 
-			}
+
         }
 
         [Authorize]
@@ -351,8 +305,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             {
                 Respuesta respuesta = new Respuesta();
 
-                try
-                {
                     var resultado = db.Execute("ActualizarUsuario",
                     new { entidad.IdUsuario, entidad.NombreUsuario, entidad.IdRol, entidad.Correo, entidad.Estado },
                     commandType: CommandType.StoredProcedure);
@@ -368,13 +320,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     respuesta.Codigo = "00";
                     respuesta.Mensaje = "Usuario actualizado correctamente";
                     return Ok(respuesta);
-                }
-                catch (Exception ex)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Error al actualizar el usuario: " + ex.Message;
-                    return StatusCode(500, respuesta);
-                }
+               
             }
         }
 
@@ -383,8 +329,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("EliminarUsuario")]
         public IActionResult EliminarUsuario(long  IdUsuario)
         {
-            try
-            {
+
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     Respuesta respuesta = new Respuesta();
@@ -402,11 +347,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
         }
     }
 }
