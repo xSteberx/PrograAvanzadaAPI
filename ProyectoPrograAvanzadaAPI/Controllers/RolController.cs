@@ -71,8 +71,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("RegistraRol")]
         public IActionResult RegistraRol(Rol entidad)
         {
-            try
-            {
+
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     Respuesta respuesta = new Respuesta();
@@ -89,11 +88,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+    
         }
 
         [HttpPut]
@@ -104,8 +99,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             {
                 Respuesta respuesta = new Respuesta();
 
-                try
-                {
                     var resultado = db.Execute("ActualizaRol",
                     new { entidad.IdRol, entidad.Nombre },
                     commandType: CommandType.StoredProcedure);
@@ -121,13 +114,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     respuesta.Codigo = "00";
                     respuesta.Mensaje = "Rol actualizado correctamente";
                     return Ok(respuesta);
-                }
-                catch (Exception ex)
-                {
-                    respuesta.Codigo = "-1";
-                    respuesta.Mensaje = "Error al actualizar el rol: " + ex.Message;
-                    return StatusCode(500, respuesta);
-                }
+ 
             }
         }
 
@@ -137,8 +124,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("EliminarRol")]
         public IActionResult EliminarRol(long IdRol)
         {
-            try
-            {
+
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     Respuesta respuesta = new Respuesta();
@@ -156,11 +142,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+   
         }
 
     }

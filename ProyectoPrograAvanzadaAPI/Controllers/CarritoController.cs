@@ -20,7 +20,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         [Route("ConsultarCarrito")]
         public IActionResult ConsultarCarrito(long IdUsuario)
         {
-            try {
 
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
@@ -42,10 +41,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 					return Ok(respuesta);
 				}
-			}catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
+			
 
         }
 
@@ -54,8 +50,6 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 		[Route("AgregarCarrito")]
 		public IActionResult AgregarCarrito(Carrito entidad)
 		{
-			try
-			{
 				using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
 				{
 					CarritoRespuesta respuesta = new CarritoRespuesta();
@@ -73,17 +67,14 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 					return Ok(respuesta);
 
 				}
-			}catch(Exception ex) {
-				return BadRequest(ex.Message);
-			}
+
 		}
 
         [HttpDelete]
         [Route("RemueveProducto")]
         public IActionResult RemueveProducto( long IdProducto)
         {
-            try
-            {
+
                 using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     CarritoRespuesta respuesta = new CarritoRespuesta();
@@ -101,11 +92,8 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                     return Ok(respuesta);
 
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            
+
         }
 
 
