@@ -15,7 +15,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
     public class ProductoController(IConfiguration _configuration) : ControllerBase
     {
 
-    
+
         [HttpGet]
         [Route("ConsultarProductos")]
         public IActionResult ConsultarProductos(bool MostrarTodos)
@@ -42,7 +42,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             }
         }
 
-        
+
 
         [Authorize]
         [HttpGet]
@@ -74,7 +74,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
 
 
 
-       
+
         [HttpPost]
         [Route("RegistrarProducto")]
         public async Task<IActionResult> RegistrarProducto(Producto entidad)
@@ -84,7 +84,7 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
                 Respuesta respuesta = new Respuesta();
 
                 var resultado = db.Query<Producto>("RegistrarProducto",
-                    new { entidad.Nombre, entidad.Precio, entidad.IdCategoria, entidad.Imagen },
+                    new { entidad.Nombre, entidad.Precio, entidad.IdCategoria, entidad.Imagen, entidad.Stock },
                     commandType: CommandType.StoredProcedure).FirstOrDefault();
 
                 if (resultado == null)
@@ -111,22 +111,22 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
             {
                 Respuesta respuesta = new Respuesta();
 
-                    var resultado = db.Execute("ActualizarProducto",
-                    new { entidad.IdProducto,entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre,entidad.Imagen },
-                    commandType: CommandType.StoredProcedure);
+                var resultado = db.Execute("ActualizarProducto",
+                new { entidad.IdProducto, entidad.Precio, entidad.IdCategoria, entidad.Estado, entidad.Nombre, entidad.Imagen, entidad.Stock },
+                commandType: CommandType.StoredProcedure);
 
 
-                    if (resultado <= 0)
-                    {
-                        respuesta.Codigo = "-1";
-                        respuesta.Mensaje = "No se pudo actualizar este servicio";
-                        return Ok(respuesta);
-                    }
-
-                    respuesta.Codigo = "00";
-                    respuesta.Mensaje = "Producto actualizado correctamente";
+                if (resultado <= 0)
+                {
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "No se pudo actualizar este servicio";
                     return Ok(respuesta);
-              
+                }
+
+                respuesta.Codigo = "00";
+                respuesta.Mensaje = "Producto actualizado correctamente";
+                return Ok(respuesta);
+
             }
         }
 
@@ -137,23 +137,23 @@ namespace ProyectoPrograAvanzadaAPI.Controllers
         public IActionResult EliminarProducto(long IdProducto)
         {
 
-                using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var db = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                Respuesta respuesta = new Respuesta();
+
+                var resultado = db.Execute("EliminaProducto",
+                    new { IdProducto },
+                    commandType: CommandType.StoredProcedure);
+
+                if (resultado <= 0)
                 {
-                    Respuesta respuesta = new Respuesta();
-
-                    var resultado = db.Execute("EliminaProducto",
-                        new { IdProducto },
-                        commandType: CommandType.StoredProcedure);
-
-                    if (resultado <= 0)
-                    {
-                        respuesta.Codigo = "-1";
-                        respuesta.Mensaje = "Producto no existente";
-                    }
-
-                    return Ok(respuesta);
-
+                    respuesta.Codigo = "-1";
+                    respuesta.Mensaje = "Producto no existente";
                 }
+
+                return Ok(respuesta);
+
+            }
 
         }
     }
